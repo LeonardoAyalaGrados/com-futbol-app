@@ -9,14 +9,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/futbolista")
 public class FutbolistaController {
@@ -38,9 +37,11 @@ public class FutbolistaController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Futbolista> buscarPorId(@PathVariable Long id){
-        Optional<Futbolista> futbolistaOptional =Optional.of(futbolistaServices.buscarPorId(id));
-        return futbolistaOptional
-                .map(futbolista -> ResponseEntity.ok(futbolista))
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+        try {
+            Futbolista futbolistaEncontrado = futbolistaServices.buscarPorId(id);
+            return ResponseEntity.ok(futbolistaEncontrado);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 }
